@@ -1,15 +1,27 @@
-const notesContainer = document.querySelector('.container');
+const notesContainer = document.querySelector('.note-container');
 const createBtn = document.querySelector('.btn');
 let notes = document.querySelectorAll('.input-box');
 
 function showNotes() {
-    notesContainer.innerHTML = localStorage.getItem('notes');
+    const savedNotes = localStorage.getItem('notes');
+    if (savedNotes) {
+        notesContainer.innerHTML = savedNotes;
+        setupNotes();
+    }
 }
 
 function updateStorage() {
     localStorage.setItem('notes', notesContainer.innerHTML);
 }
 
+function setupNotes() {
+    notes = document.querySelectorAll('.input-box');
+    notes.forEach(note => {
+        note.onkeyup = () => {
+            updateStorage();
+        };
+    });
+}
 
 createBtn.addEventListener('click', () => {
     const inputBox = document.createElement('p');
@@ -20,7 +32,11 @@ createBtn.addEventListener('click', () => {
     img.src = "images/delete.png";
     img.alt = "Delete Note";
 
-    notesContainer.appendChild(inputBox).appendChild(img);
+    inputBox.appendChild(img);
+    notesContainer.appendChild(inputBox);
+
+    updateStorage();
+    setupNotes();
 });
 
 notesContainer.addEventListener('click', (e) => {
@@ -28,17 +44,7 @@ notesContainer.addEventListener('click', (e) => {
         e.target.parentElement.remove();
         updateStorage();
     }
-    else if (e.target.tagName === 'P') {
-        notes = document.querySelectorAll('.input-box');
-        notes.forEach(note => {
-            note.onkeyup = () => {
-                updateStorage();
-            }
-        });
-    }
 });
-
-showNotes();
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -46,3 +52,5 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
 });
+
+showNotes();
